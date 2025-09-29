@@ -11,10 +11,19 @@ import { images } from "@/constants/images";
 import SearchBar from "@/components/SearchBar";
 
 import { useRouter } from "expo-router";
+import useFetch from "@/services/usefetch";
+import { fetchMovies } from "@/services/api";
 
 export default function Index() {
 	// useRouter hook for router to move to diff screen
 	const router = useRouter();
+	// destructure the data with the call of the useFetch hook with a callback function
+	const {
+		data: movies,
+		loading: moviesLoading,
+		error: moviesError,
+	} = useFetch(() => fetchMovies({ query: "" }));
+
 	return (
 		<View className='flex-1 bg-primary'>
 			<Image
