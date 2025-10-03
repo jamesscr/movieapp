@@ -5,7 +5,10 @@ import {
 	ScrollView,
 	FlatList,
 	ActivityIndicator,
+	Platform,
+	Dimensions,
 } from "react-native";
+import { useEffect, useState } from "react";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import SearchBar from "@/components/SearchBar";
@@ -15,9 +18,38 @@ import useFetch from "@/services/usefetch";
 import { fetchMovies } from "@/services/api";
 import MovieCard from "../../components/MovieCard";
 
+function useNumColumns() {
+	const [cols, setCols] = useState(3);
+
+	useEffect(() => {
+		const update = () => {
+			const { width } = Dimensions.get("window");
+			const isWeb = Platform.OS === "web";
+			if (isWeb) {
+				if (width >= 997) setCols(6);
+				else if (width >= 859) setCols(5);
+				else if (width >= 648) setCols(4);
+				else setCols(3);
+			}
+			// else {
+			// 	// simple native breakpoints (swap for expo-device if you prefer)
+			// 	if (width >= 1024) setCols(6);
+			// 	else if (width >= 768) setCols(4);
+			// 	else setCols(3);
+			// }
+		};
+		update();
+		const sub = Dimensions.addEventListener("change", update);
+		return () => sub?.remove?.();
+	}, []);
+
+	return cols;
+}
+
 export default function Index() {
 	// useRouter hook for router to move to diff screen
 	const router = useRouter();
+	const numColumns = useNumColumns();
 	// destructure the data with the call of the useFetch hook with a callback function
 	const {
 		data: movies,
@@ -60,12 +92,14 @@ export default function Index() {
 								Latest Movies
 							</Text>
 							<FlatList
+								key={`grid-${numColumns}`} // 👈 forces remount when columns change
 								data={movies}
 								renderItem={({ item }) => <MovieCard {...item} />}
 								keyExtractor={(item) => item.id.toString()}
-								numColumns={3}
+								numColumns={numColumns}
 								columnWrapperStyle={{
-									justifyContent: "flex-start",
+									justifyContent: "center", // 👈 center the row
+									alignItems: "center",
 									gap: 20,
 									paddingRight: 5,
 									marginBottom: 10,

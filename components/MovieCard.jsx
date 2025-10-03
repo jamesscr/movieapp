@@ -1,7 +1,27 @@
 import { Link } from "expo-router";
-import { Text, Image, TouchableOpacity, View } from "react-native";
+import {
+	Text,
+	Image,
+	TouchableOpacity,
+	View,
+	Dimensions,
+	Platform,
+} from "react-native";
 
 import { icons } from "@/constants/icons";
+
+const { width } = Dimensions.get("window");
+const isWeb = Platform.OS === "web";
+
+const webScreens = () => {
+	let deviceWidth = "";
+	if (isWeb) {
+		if (width >= 997) deviceWidth = "w-[160px]";
+		else if (width <= 530) deviceWidth = "w-[30%]";
+		else deviceWidth = "w-[30%]";
+	}
+	return deviceWidth;
+};
 
 const MovieCard = ({
 	id,
@@ -12,7 +32,7 @@ const MovieCard = ({
 }: Movie) => {
 	return (
 		<Link href={`/movie/${id}`} asChild>
-			<TouchableOpacity className='w-[30%]'>
+			<TouchableOpacity className={`${isWeb ? webScreens() : "w-[30%]"}`}>
 				<Image
 					source={{
 						uri: poster_path
